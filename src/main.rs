@@ -1,4 +1,6 @@
-use actix_web::{get, post, web, App, HttpServer, Responder, HttpResponse};
+use actix_web::{middleware::Logger,get, post, web, App, HttpServer, Responder, HttpResponse};
+use env_logger;
+
 
 #[get("/")]
 async fn index() ->impl Responder{
@@ -17,8 +19,10 @@ async fn manual_hello() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     HttpServer::new(|| {
         App::new()
+            .wrap(Logger::default())
             .service(index)
             .service(echo)
             .route("/hey", web::get().to(manual_hello))
